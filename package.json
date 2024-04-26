@@ -6,7 +6,12 @@
 		"email": "hotsixman05@gmail.com",
 		"url": "https://github.com/hotsixman"
 	},
-	"keywords": ["sveltekit", "svelte", "board", "community"],
+	"keywords": [
+		"sveltekit",
+		"svelte",
+		"board",
+		"community"
+	],
 	"license": "MIT",
 	"scripts": {
 		"dev": "vite dev",
@@ -50,5 +55,8 @@
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@sveltekit-board/db": "^1.0.0"
+	}
 }
