@@ -25,9 +25,9 @@ export default class Board {
             const tables = (await run("SHOW TABLES") as any[]).map(e => Object.values(e)[0])
             if (tables.includes(`board/main/${name}`)) return null;
 
-            await run(`CREATE TABLE \`board/main/${name}\` ( \`order\` int(11) NOT NULL, \`title\` text NOT NULL, \`content\` longtext NOT NULL, \`authorProvider\` tinytext NOT NULL, \`authorProviderId\` text NOT NULL, \`createdTime\` bigint(20) NOT NULL, \`lastEditedTime\` bigint(20) DEFAULT NULL, \`original\` int(11) DEFAULT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;`);
-            await run(`ALTER TABLE \`board/main/${name}\` ADD PRIMARY KEY (\`order\`);`);
-            await run(`ALTER TABLE \`board/main/${name}\` MODIFY \`order\` int(11) NOT NULL AUTO_INCREMENT;`);
+            await run(`CREATE TABLE \`board/main/${name}\` ( \`postId\` int(11) NOT NULL, \`title\` text NOT NULL, \`content\` longtext NOT NULL, \`authorProvider\` tinytext NOT NULL, \`authorProviderId\` text NOT NULL, \`createdTime\` bigint(20) NOT NULL, \`lastEditedTime\` bigint(20) DEFAULT NULL, \`original\` int(11) DEFAULT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;`);
+            await run(`ALTER TABLE \`board/main/${name}\` ADD PRIMARY KEY (\`postId\`);`);
+            await run(`ALTER TABLE \`board/main/${name}\` MODIFY \`postId\` int(11) NOT NULL AUTO_INCREMENT;`);
 
             return new Board(name);
         })
@@ -35,7 +35,7 @@ export default class Board {
 
     static async dropBoard(name: string){
         if (!/^[a-zA-Z0-9_]*$/.test(name)) return null;
-        return await runQuery(async (run): Promise<Board | null> => {
+        return await runQuery(async (run) => {
             const tables = (await run("SHOW TABLES") as any[]).map(e => Object.values(e)[0])
             if (!tables.includes(`board/main/${name}`)) return null;
 
@@ -51,23 +51,23 @@ export default class Board {
         })
     }
 
-    async edit(title: string, content:string, order: number){
+    async edit(title: string, content:string, postId: number){
         return await runQuery(async(run) => {
-            const original = await run(`SELECT * FROM \`${this.tableName}\` WHERE \`order\` = ?`, [order])
+            const original = await run(`SELECT * FROM \`${this.tableName}\` WHERE \`postId\` = ?`, [postId])
             if(original.length === 0) return null;
 
             if(this.useHistory){
-                return await run(`INSERT INTO \`${this.tableName}\` (\`title\`, \`content\`, \`authorProvider\`, \`authorProviderId\`, \`createdTime\`, \`original\`) VALUES (?, ?, ?, ?, ?, ?)`, [title, content, original[0].authorProvider, original[0].authorProviderId, Date.now(), order]);
+                return await run(`INSERT INTO \`${this.tableName}\` (\`title\`, \`content\`, \`authorProvider\`, \`authorProviderId\`, \`createdTime\`, \`original\`) VALUES (?, ?, ?, ?, ?, ?)`, [title, content, original[0].authorProvider, original[0].authorProviderId, Date.now(), postId]);
             }
             else{
-                return await run(`UPDATE \`${this.tableName}\` SET \`title\` = ?, \`content\` = ?, \`lastEditedTime\` = ? WHERE \`order\` = ?`, [title, content, Date.now(), order])
+                return await run(`UPDATE \`${this.tableName}\` SET \`title\` = ?, \`content\` = ?, \`lastEditedTime\` = ? WHERE \`postId\` = ?`, [title, content, Date.now(), postId])
             }
         })
     }
 
-    async delete(order:number){
+    async delete(postId:number){
         return await runQuery(async(run) => {
-            return await run(`DELETE FROM \`${this.tableName}\` WHERE \`order\` = ? OR \`original\` = ?`, [order, order])
+            return await run(`DELETE FROM \`${this.tableName}\` WHERE \`postId\` = ? OR \`original\` = ?`, [postId, postId])
         })
     }
 }

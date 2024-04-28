@@ -1,5 +1,25 @@
-import Board from "$lib/src/Board.js";
+import Comment from "$lib/src/Comment.js"
 
 export async function load(){
-    console.log(await Board.dropBoard('test'))
+    const comment:Comment = await Comment.getComment('test') || await Comment.createComment('test');
+
+    console.log(await comment.getTop(1, 0, 1000))
+
+    /*
+    for(const num of [1,2,3,4,5,6,7,8,9,10]){
+        await comment.write(num.toString(), 1, {provider:'test', providerId: 'test'})
+    }
+
+    for(const num of [1,2,3,4,5]){
+        await comment.write(num.toString(), 1, {provider:'test', providerId: 'test'}, 5)
+    }
+
+    for(const num of [1,2,3,4,5]){
+        await comment.write(num.toString(), 1, {provider:'test', providerId: 'test'}, 7)
+    }
+
+    for(const num of [1,2,3,4,5]){
+        await comment.write(num.toString(), 1, {provider:'test', providerId: 'test'}, 8)
+    }
+    */
 }
