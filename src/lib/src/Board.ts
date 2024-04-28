@@ -65,7 +65,7 @@ export default class Board {
         })
     }
 
-    async delete(postId:number){
+    async remove(postId:number){
         return await runQuery(async(run) => {
             return await run(`DELETE FROM \`${this.tableName}\` WHERE \`postId\` = ? OR \`original\` = ?`, [postId, postId])
         })
