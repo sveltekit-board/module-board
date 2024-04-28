@@ -77,11 +77,23 @@ export default class Comment {
             return await run(`SELECT * FROM \`${this.tableName}\` WHERE \`postId\` = ? AND \`parentId\` = ? ORDER BY \`commentId\` DESC LIMIT ?, ?`, [postId, parentId, start, limit])
         }))
     }
+
+    async remove(commentId:number){
+        return await runQuery(async(run) => {
+            let exists = Boolean(Object.values((await run(`SELECT EXISTS(SELECT * FROM \`${this.tableName}\` WHERE \`parentId\` = ?)`, [commentId]))[0])[0])
+            if(exists){
+                return await run(`UPDATE \`${this.tableName}\` SET \`content\` = NULL, \`commenterProvider\` = NULL, \`commenterProviderId\` = NULL WHERE \`commentId\` = ?`, [commentId]);
+            }
+            else{
+                return await run(`DELETE FROM \`${this.tableName}\` WHERE \`commentId\` = ?`, [commentId])
+            }
+        })
+    }
 }
 
 export interface CommentType {
     commentId: number,
-    content: string,
+    content: string|null,
     commenterProvider: string,
     commenterProviderId: string,
     createdTime: number,
